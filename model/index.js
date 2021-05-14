@@ -15,11 +15,31 @@ const listContacts = async () => {
   }
 }
 
-//
-const getContactById = async (contactId) => {}
+// найти контакт по id
+const getContactById = async (contactId) => {
+  try {
+    const data = await fs.readFile(contactsPath)
+    const contacts = JSON.parse(data)
+    const contact = contacts.find(({ id }) => String(id) === contactId)
+    return contact
+  } catch (err) {
+    console.log(err.message)
+  }
+}
 
 // удалить контакт
-const removeContact = async (contactId) => {}
+const removeContact = async (contactId) => {
+  try {
+    const data = await fs.readFile(contactsPath)
+    const contacts = JSON.parse(data)
+    const deletedContact = contacts.filter(({ id }) => String(id) === contactId)
+    const updatedContacts = JSON.stringify(contacts.filter(({ id }) => String(id) !== contactId), null, 2)
+    await fs.writeFile(contactsPath, updatedContacts)
+    return deletedContact
+  } catch (err) {
+    return undefined
+  }
+}
 
 // создать новый  контакт
 const addContact = async({ name, email, phone, englishSpeaking }) => {
@@ -39,22 +59,38 @@ const addContact = async({ name, email, phone, englishSpeaking }) => {
     }
     const newContactsList = JSON.stringify([...contacts, newContact], null, 2)
     await fs.writeFile(contactsPath, newContactsList)
-    // if (!body.name || !body.email || !body.phone) {
-    //   return contacts
-    // }
-
     return newContact
-
-    // const record = { id, ...body }
-    // data.push(record)
-    // return (JSON.parse(record))
   } catch (err) {
     console.log(err.message)
   }
 }
 
 // редактировать контакт
-const updateContact = async (contactId, body) => {}
+const updateContact = async (contactId, body) => {
+  try {
+    // if (!body) {
+    //   return
+    // }
+    const data = await fs.readFile(contactsPath)
+    const contacts = JSON.parse(data)
+    const contact = contacts.find(({ id }) => String(id) === contactId)
+    const updatedContact = { ...contact, ...body }
+
+    const updatedContactsList = contacts.map((contact) => {
+      if (updatedContact.id === contact.id) {
+        return updatedContact
+      } else {
+        return contact
+      }
+    })
+
+    await fs.writeFile(contactsPath, JSON.stringify(updatedContactsList, null, 2))
+
+    return updatedContact
+  } catch (err) {
+    console.log(err.message)
+  }
+}
 
 module.exports = {
   listContacts,
