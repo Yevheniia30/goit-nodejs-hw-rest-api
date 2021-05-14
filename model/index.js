@@ -1,7 +1,6 @@
 const path = require('path')
 const fs = require('fs/promises')
 const { v4: uuid } = require('uuid')
-// const contacts = require('./contacts.json')
 
 const contactsPath = path.join(__dirname, 'contacts.json')
 
@@ -42,9 +41,9 @@ const removeContact = async (contactId) => {
 }
 
 // создать новый  контакт
-const addContact = async({ name, email, phone, englishSpeaking }) => {
+const addContact = async({ name, email, phone }) => {
   try {
-    const body = { name, email, phone, englishSpeaking }
+    const body = { name, email, phone }
     if (!name || !email || !phone) {
       return
     }
@@ -54,8 +53,7 @@ const addContact = async({ name, email, phone, englishSpeaking }) => {
 
     const newContact = {
       id,
-      ...body,
-      ...(englishSpeaking ? {} : { englishSpeaking: false })
+      ...body
     }
     const newContactsList = JSON.stringify([...contacts, newContact], null, 2)
     await fs.writeFile(contactsPath, newContactsList)
@@ -68,9 +66,6 @@ const addContact = async({ name, email, phone, englishSpeaking }) => {
 // редактировать контакт
 const updateContact = async (contactId, body) => {
   try {
-    // if (!body) {
-    //   return
-    // }
     const data = await fs.readFile(contactsPath)
     const contacts = JSON.parse(data)
     const contact = contacts.find(({ id }) => String(id) === contactId)

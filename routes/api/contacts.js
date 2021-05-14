@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Contacts = require('../../model/index')
-// const { listContacts } = require('../../model/index')
+const { validateAddContact, validateUpdateContact } = require('./validation')
 
 // если после res не писать status(), он по умолчанию 200
 
@@ -29,10 +29,10 @@ router.get('/:contactId', async (req, res, next) => {
 })
 
 // создать контакт
-router.post('/', async (req, res, next) => {
+router.post('/', validateAddContact, async (req, res, next) => {
   try {
-    const { name, email, phone, englishSpeaking } = req.body
-    const contact = await Contacts.addContact({ name, email, phone, englishSpeaking })
+    const { name, email, phone } = req.body
+    const contact = await Contacts.addContact({ name, email, phone })
     if (!name || !email || !phone) {
       return res.status(400).json({ status: 'bad request', code: 400, message: 'missing required name field' })
     } return res.status(201).json({ status: 'success', code: 201, data: { contact } })
@@ -54,12 +54,9 @@ router.delete('/:contactId', async (req, res, next) => {
 })
 
 // редактировать контакт
-router.put('/:contactId', async (req, res, next) => {
+router.put('/:contactId', validateUpdateContact, async (req, res, next) => {
   try {
     const contact = await Contacts.updateContact(req.params.contactId, req.body)
-    // if (!req.body) {
-    //   return res.status(400).json({ status: 'bad request', code: 400, message: 'missing fields' })
-    // }
     if (contact.id) {
       return res.json({ status: 'success', code: 200, data: { contact } })
     }
