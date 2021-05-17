@@ -44,9 +44,9 @@ const removeContact = async (contactId) => {
 const addContact = async({ name, email, phone }) => {
   try {
     const body = { name, email, phone }
-    if (!name || !email || !phone) {
-      return
-    }
+    // if (!name || !email || !phone) {
+    //   return
+    // }
     const data = await fs.readFile(contactsPath)
     const id = uuid()
     const contacts = JSON.parse(data)

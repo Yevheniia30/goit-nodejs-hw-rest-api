@@ -33,9 +33,10 @@ router.post('/', validateAddContact, async (req, res, next) => {
   try {
     const { name, email, phone } = req.body
     const contact = await Contacts.addContact({ name, email, phone })
-    if (!name || !email || !phone) {
-      return res.status(400).json({ status: 'bad request', code: 400, message: 'missing required name field' })
-    } return res.status(201).json({ status: 'success', code: 201, data: { contact } })
+    // if (!name || !email || !phone) {
+    //   return res.status(400).json({ status: 'bad request', code: 400, message: 'missing required name field' })
+    // }
+    return res.status(201).json({ status: 'success', code: 201, data: { contact } })
   } catch (err) {
     next(err)
   }
