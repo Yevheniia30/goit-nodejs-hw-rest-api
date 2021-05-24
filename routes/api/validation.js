@@ -2,7 +2,8 @@ const Joi = require('joi')
 
 const schemaAddContact = Joi.object({
   name: Joi.string()
-    .regex(/^[-a-zA-Z ]*$/)
+    // .regex(/^[-a-zA-Z ]*$/)
+    .regex(/[A-Z]\w+ [A-Z]\w+/)
     .min(2)
     .max(30)
     .required(),
@@ -13,6 +14,8 @@ const schemaAddContact = Joi.object({
   phone: Joi.string()
     .pattern(/^\([0-9]{3}\) [0-9]{3}-[0-9]{4}$/)
     .required(),
+
+  // favorite: Joi.boolean().required()
 })
 
 const schemaUpdateContact = Joi.object({
@@ -28,9 +31,15 @@ const schemaUpdateContact = Joi.object({
 
   phone: Joi.string()
     .pattern(/^\([0-9]{3}\) [0-9]{3}-[0-9]{4}$/)
-    .optional()
+    .optional(),
+
+  // favorite: Joi.boolean().required()
 
 }).min(1)
+
+const schemaUpdateStatus = Joi.object({
+  favorite: Joi.boolean().required()
+})
 
 const validate = async (schema, body, next) => {
   try {
@@ -49,6 +58,10 @@ const validateUpdateContact = (req, _res, next) => {
   return validate(schemaUpdateContact, req.body, next)
 }
 
+const validateUpdateStatus = (req, _res, next) => {
+  return validate(schemaUpdateStatus, req.body, next)
+}
+
 module.exports = {
-  validateAddContact, validateUpdateContact
+  validateAddContact, validateUpdateContact, validateUpdateStatus
 }
