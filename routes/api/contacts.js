@@ -1,9 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Contacts = require('../../model/index')
-const { validateAddContact, validateUpdateContact } = require('./validation')
-
-// если после res не писать status(), он по умолчанию 200
+const { validateAddContact, validateUpdateContact, validateUpdateStatus } = require('./validation')
 
 // список всех контактов
 router.get('/', async (req, res, next) => {
@@ -33,12 +31,14 @@ router.post('/', validateAddContact, async (req, res, next) => {
   try {
     const { name, email, phone } = req.body
     const contact = await Contacts.addContact({ name, email, phone })
-    // if (!name || !email || !phone) {
-    //   return res.status(400).json({ status: 'bad request', code: 400, message: 'missing required name field' })
-    // }
+
     return res.status(201).json({ status: 'success', code: 201, data: { contact } })
-  } catch (err) {
-    next(err)
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      error.code = 400
+      error.status = 'error'
+    }
+    next(error)
   }
 })
 
@@ -58,7 +58,20 @@ router.delete('/:contactId', async (req, res, next) => {
 router.put('/:contactId', validateUpdateContact, async (req, res, next) => {
   try {
     const contact = await Contacts.updateContact(req.params.contactId, req.body)
-    if (contact.id) {
+    if (contact._id) {
+      return res.json({ status: 'success', code: 200, data: { contact } })
+    }
+    res.status(404).json({ status: 'error', code: 404, message: 'Not found' })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// добавить/удалить в избранное
+router.patch('/:contactId/favorite', validateUpdateStatus, async (req, res, next) => {
+  try {
+    const contact = await Contacts.updateStatusContact(req.params.contactId, req.body)
+    if (contact._id) {
       return res.json({ status: 'success', code: 200, data: { contact } })
     }
     res.status(404).json({ status: 'error', code: 404, message: 'Not found' })
