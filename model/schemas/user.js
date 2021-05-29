@@ -13,10 +13,10 @@ const userSchema = new Schema({
     type: String,
     required: [true, 'Email is required'],
     unique: true,
-    validate(value) {
-      const re = /\S+@\S+\.\S+/gi
-      return re.test(String(value).toLowerCase())
-    }
+    // validate(value) {
+    //   const re = /\S+@\S+\.\S+/gi
+    //   return re.test(String(value).toLowerCase())
+    // }
   },
   subscription: {
     type: String,

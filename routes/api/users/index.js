@@ -1,18 +1,22 @@
 const express = require('express')
 const router = express.Router()
-const { reg, login, logout, getCurrentUser } = require('../../../controllers/users')
-// const { validateAddContact, validateUpdateContact, validateUpdateStatus } = require('./validation')
+const guard = require('../../../helpers/guard')
+const { reg, login, logout, getCurrentUser, updateSubscription } = require('../../../controllers/users')
+const { validateSignup, validateLogin, validateUpdateSubcription } = require('./validation')
 
 // регистрация
-router.post('/signup', reg)
+router.post('/signup', validateSignup, reg)
 
 // логин
-router.post('/login', login)
+router.post('/login', validateLogin, login)
 
 // логаут
-router.post('/logout', logout)
+router.post('/logout', guard, logout)
 
 // данные текущего пользователя
-router.get('/current', getCurrentUser)
+router.get('/current', guard, getCurrentUser)
+
+// обновление подписки
+router.patch('/', guard, validateUpdateSubcription, updateSubscription)
 
 module.exports = router

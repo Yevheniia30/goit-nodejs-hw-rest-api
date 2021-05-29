@@ -3,6 +3,7 @@ require('dotenv').config()
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
 const Users = require('../model/users')
 const { HttpCode } = require('../helpers/constants')
+// const User = require('../model/schemas/user')
 
 // регистрация
 const reg = async (req, res, next) => {
@@ -38,7 +39,7 @@ const login = async (req, res, next) => {
       return res.status(HttpCode.UNATHORIZED).json({
         status: 'error',
         code: HttpCode.UNATHORIZED,
-        message: 'Email or password is wrong'
+        message: 'Not authorized'
       })
     }
     const payload = { id: user.id }
@@ -47,7 +48,7 @@ const login = async (req, res, next) => {
     return res.status(HttpCode.OK).json({
       status: 'success',
       code: HttpCode.OK,
-      data: { token, user: { email, subscription } }
+      data: { token, user: { subscription, email } }
     })
   } catch (err) {
     next(err)
@@ -55,11 +56,67 @@ const login = async (req, res, next) => {
 }
 
 // логаут
-const logout = async (req, res, next) => { }
+const logout = async (req, res, next) => {
+  try {
+    await Users.updateToken(req.user.id, null)
+    if (!req.user) {
+      return res.status(HttpCode.UNATHORIZED).json({
+        status: 'error',
+        code: HttpCode.UNATHORIZED,
+        message: 'Not authorized'
+      })
+    }
+    return res.status(HttpCode.NO_CONTENT).json({})
+  } catch (err) {
+    next(err)
+  }
+}
 
 // данные текущего пользователя
-const getCurrentUser = async (req, res, next) => { }
+const getCurrentUser = async (req, res, next) => {
+  try {
+    const { email, subscription } = req.user
+    const currentUser = await Users.findByEmail(email)
+    if (!currentUser) {
+      return res.status(HttpCode.UNATHORIZED).json({
+        status: 'error',
+        code: HttpCode.UNATHORIZED,
+        message: 'Not authorized'
+      })
+    }
+    return res.status(HttpCode.OK).json({
+      status: 'success',
+      code: HttpCode.OK,
+      data: { email, subscription }
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// обновление подписки
+const updateSubscription = async (req, res, next) => {
+  try {
+    const { id } = req.user
+    const user = await Users.updateUserSubscription(id, req.body)
+    const { email, subscription } = user
+    if (user) {
+      return res.status(HttpCode.OK).json({
+        status: 'success',
+        code: HttpCode.OK,
+        data: { email, subscription }
+      })
+    }
+    return res.status(HttpCode.UNATHORIZED).json({
+      status: 'error',
+      code: HttpCode.UNATHORIZED,
+      message: 'Not authorized'
+    })
+  } catch (err) {
+    next(err)
+  }
+}
 
 module.exports = {
-  reg, login, logout, getCurrentUser
+  reg, login, logout, getCurrentUser, updateSubscription
 }
