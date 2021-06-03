@@ -34,36 +34,12 @@ const userSchema = new Schema({
     default: function () {
       return gravatar.url(this.email, { s: 250 }, true)
     }
+  },
+  userIdImg: {
+    type: String,
+    default: null,
   }
-
-//   versionKey: false,
-//   timestamps: true,
-//   toObject: {
-//     virtuals: true,
-//     transform: function (doc, ret) {
-//       delete ret._id
-//       delete ret.fullName
-//       return ret
-//     }
-//   },
-//   toJSON: {
-//     virtuals: true,
-//     transform: function (doc, ret) {
-//       delete ret._id
-//       delete ret.fullName
-//       return ret
-//     }
-//   }
 })
-
-// userSchema.virtual('fullName').get(function () {
-//   return `This is contact ${this.name} - phone number ${this.phone}`
-// })
-
-// userSchema.path('name').validate((value) => {
-//   const re = /[A-Z]\w+ [A-Z]\w+/
-//   return re.test(String(value))
-// })
 
 userSchema.pre('save', async function (next) {
   if (this.isModified('password')) {

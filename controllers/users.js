@@ -1,15 +1,20 @@
 const jwt = require('jsonwebtoken')
 // const path = require('path')
-// const cloudinary = require('cloudinary').v2
+const cloudinary = require('cloudinary').v2
+const { promisify } = require('util')
 require('dotenv').config()
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
 const Users = require('../model/users')
 const { HttpCode } = require('../helpers/constants')
-const Upload = require('../services/upload-static')
-const AVATARS_OF_USERS = process.env.AVATARS_OF_USERS
-// const AVATARS_OF_USERS = path.join(process.env.AVATARS_OF_USERS, 'avatars')
+// const Upload = require('../services/upload-static')
+const Upload = require('../services/upload-cloud')
+// const AVATARS_OF_USERS = process.env.AVATARS_OF_USERS
 
-// const User = require('../model/schemas/user')
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET
+})
 
 // регистрация
 const reg = async (req, res, next) => {
@@ -129,19 +134,25 @@ const updateSubscription = async (req, res, next) => {
 const avatars = async (req, res, next) => {
   try {
     const id = req.user.id
-    const uploads = new Upload(AVATARS_OF_USERS)
-    const url = await uploads.saveAvatarToStatic({
+    // -----------КОД ДЛЯ СТАТИКИ-------------
+    // const uploads = new Upload(AVATARS_OF_USERS)
+    // const avatarUrl = await uploads.saveAvatarToStatic({
+    //   idUser: id,
+    //   pathFile: req.file.path,
+    //   name: req.file.filename,
+    //   oldFile: req.user.avatarUrl
+    // })
 
-      pathFile: req.file.path,
-      name: req.file.filename,
-      oldFile: req.user.avatarUrl
-    })
-    await Users.updateAvatar(id, url)
+    // -------------КОД ДЛЯ CLOUDINARY--------------
+    const uploadCloud = promisify(cloudinary.uploader.upload)
+    const uploads = new Upload(uploadCloud)
+    const { userIdImg, avatarUrl } = await uploads.saveAvatarToCloud(req.file.path, req.user.userIdImg)
+    await Users.updateAvatar(id, avatarUrl, userIdImg)
     console.log(req.hostname)
     return res.json({
       status: 'success',
       code: HttpCode.OK,
-      data: { url }
+      data: { avatarUrl }
     })
   } catch (err) {
     next(err)

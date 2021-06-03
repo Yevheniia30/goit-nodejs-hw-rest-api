@@ -33,8 +33,8 @@ const updateUserSubscription = async (id, body) => {
 }
 
 // обновление аватара
-const updateAvatar = async (id, avatarUrl) => {
-  return await User.updateOne({ _id: id }, { avatarUrl })
+const updateAvatar = async (id, avatarUrl, userIdImg = null) => {
+  return await User.updateOne({ _id: id }, { avatarUrl, userIdImg })
 }
 
 module.exports = {
