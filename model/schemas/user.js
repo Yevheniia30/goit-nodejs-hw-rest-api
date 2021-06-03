@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
+const gravatar = require('gravatar')
+
 const { Subscription } = require('../../helpers/constants')
 const bcrypt = require('bcryptjs')
 const SALT_FACTOR = 6
@@ -27,35 +29,17 @@ const userSchema = new Schema({
     type: String,
     default: null,
   },
-
-//   versionKey: false,
-//   timestamps: true,
-//   toObject: {
-//     virtuals: true,
-//     transform: function (doc, ret) {
-//       delete ret._id
-//       delete ret.fullName
-//       return ret
-//     }
-//   },
-//   toJSON: {
-//     virtuals: true,
-//     transform: function (doc, ret) {
-//       delete ret._id
-//       delete ret.fullName
-//       return ret
-//     }
-//   }
+  avatarUrl: {
+    type: String,
+    default: function () {
+      return gravatar.url(this.email, { s: 250 }, true)
+    }
+  },
+  userIdImg: {
+    type: String,
+    default: null,
+  }
 })
-
-// userSchema.virtual('fullName').get(function () {
-//   return `This is contact ${this.name} - phone number ${this.phone}`
-// })
-
-// userSchema.path('name').validate((value) => {
-//   const re = /[A-Z]\w+ [A-Z]\w+/
-//   return re.test(String(value))
-// })
 
 userSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
