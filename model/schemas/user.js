@@ -1,9 +1,9 @@
-const mongoose = require('mongoose')
-const { Schema } = mongoose
+// const mongoose = require('mongoose')
+const { Schema, model } = require('mongoose')
 const gravatar = require('gravatar')
-
-const { Subscription } = require('../../helpers/constants')
+const { v4: uuidv4 } = require('uuid')
 const bcrypt = require('bcryptjs')
+const { Subscription } = require('../../helpers/constants')
 const SALT_FACTOR = 6
 
 const userSchema = new Schema({
@@ -38,6 +38,15 @@ const userSchema = new Schema({
   userIdImg: {
     type: String,
     default: null,
+  },
+  verify: {
+    type: Boolean,
+    default: false
+  },
+  verifyToken: {
+    type: String,
+    required: true,
+    default: uuidv4()
   }
 })
 
@@ -53,6 +62,6 @@ userSchema.methods.validPassword = async function (password) {
   return await bcrypt.compare(String(password), this.password)
 }
 
-const User = mongoose.model('user', userSchema)
+const User = model('user', userSchema)
 
 module.exports = User
