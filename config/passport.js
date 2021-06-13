@@ -11,8 +11,6 @@ const opts = {
   secretOrKey: JWT_SECRET_KEY
 }
 
-// opts.issuer = 'accounts.examplesoft.com'
-// opts.audience = 'yoursite.net'
 passport.use(new Strategy(opts, async (payload, done) => {
   try {
     const user = await Users.findById(payload.id)

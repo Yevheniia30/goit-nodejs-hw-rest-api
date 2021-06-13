@@ -1,44 +1,32 @@
 const sgMail = require('@sendgrid/mail')
 const nodemailer = require('nodemailer')
-// const config = require('../config/config')
+const config = require('../config/config')
 
 require('dotenv').config()
 
 class CreateSenderSendgrid {
   async send(msg) {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-
-    // const msg = {
-    //   to: 'test@example.com',
-    //   from: 'test@example.com',
-    //   subject: 'Sending with SendGrid is Fun',
-    //   text: 'and easy to do anywhere, even with Node.js',
-    //   html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-    // }
-
-    return await sgMail.send({ ...msg, from: 'suskagoit@ex.ua' })
+    return await sgMail.send({ ...msg, from: config.email.sendgrid })
   }
 }
 
 class CreateSenderNodemailer {
   async send(msg) {
-    const config = {
-      host: 'smtp.meta.ua',
+    const options = {
+      host: config.email.host,
       port: 465,
       secure: true,
       auth: {
-        user: 'suskagoit@meta.ua',
+        user: config.email.nodemailer,
         pass: process.env.PASSWORD,
       },
     }
 
-    const transporter = nodemailer.createTransport(config)
+    const transporter = nodemailer.createTransport(options)
     const emailOptions = {
-      from: 'suskagoit@meta.ua',
+      from: config.email.nodemailer,
       ...msg
-    //   to: 'noresponse@gmail.com',
-    //   subject: 'Nodemailer test',
-    //   text: 'Привет. Мы тестируем отправку писем!',
     }
 
     return await transporter.sendMail(emailOptions)

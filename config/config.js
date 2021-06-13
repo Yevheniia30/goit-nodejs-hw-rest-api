@@ -1,7 +1,7 @@
 module.exports = {
   email: {
-    sendgrid: 'suskagoit@meta.ua',
-    nodemailer: 'suskagoit@ex.ua',
+    sendgrid: 'suskagoit@ex.ua',
+    nodemailer: 'suskagoit@meta.ua',
     host: 'smtp.meta.ua'
   }
 }

@@ -21,11 +21,8 @@ class EmailService {
         const mailGenerator = new Mailgen({
     theme: 'neopolitan',
     product: {
-        // Appears in header & footer of e-mails
-        name: 'System Contacts',
+       name: 'System Contacts',
         link: this.link
-        // Optional product logo
-        // logo: 'https://mailgen.js/img/logo.png'
     }
         })
         const email = {
@@ -35,7 +32,7 @@ class EmailService {
         action: {
             instructions: 'To get started with System Contacts, please click here:',
             button: {
-                color: '#22BC66', // Optional action button color
+                color: '#22BC66', 
                 text: 'Confirm your account',
                 link: `${this.link}/api/users/verify/${token}`
             }
