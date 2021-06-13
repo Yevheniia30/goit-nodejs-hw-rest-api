@@ -2,8 +2,14 @@ const express = require('express')
 const router = express.Router()
 const guard = require('../../../helpers/guard')
 const upload = require('../../../helpers/upload')
-const { reg, login, logout, getCurrentUser, updateSubscription, avatars } = require('../../../controllers/users')
+const { reg, login, logout, getCurrentUser, updateSubscription, avatars, verify, repeatVerify } = require('../../../controllers/users')
 const { validateSignup, validateLogin, validateUpdateSubcription } = require('./validation')
+
+// верификация
+router.get('/verify/:token', verify)
+
+// повторная верификация
+router.post('/verify', repeatVerify)
 
 // регистрация
 router.post('/signup', validateSignup, reg)
